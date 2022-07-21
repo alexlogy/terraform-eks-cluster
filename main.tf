@@ -1,5 +1,11 @@
 provider "aws" {
   region = local.region
+  
+  default_tags {
+	  tags = {
+		  Project	= local.project
+	  }
+  }
 }
 
 
@@ -53,17 +59,13 @@ module "eks" {
       update_config = {
         max_unavailable_percentage = 10 # or set `max_unavailable`
       }
-
-      additional_tags = {
-        Name    = format("%s-nodes", local.name)
-        Project = local.project
-      }
   }
 
   eks_managed_node_groups = {
     # default node group
     default = {
-      name_prefix      = "default-"
+      name             = "default-node"
+      use_name_prefix  = true
       capacity_type    = "ON_DEMAND"  # default node group to be on-demand
       desired_capacity = 2
       max_capacity     = 8
