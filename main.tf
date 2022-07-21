@@ -23,6 +23,8 @@ module "eks" {
 
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
+  
+  cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
 
   # create OpenID Connect Provider for EKS to enable IRSA
   enable_irsa = true
