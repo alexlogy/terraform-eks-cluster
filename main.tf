@@ -88,6 +88,8 @@ module "eks" {
                 description                   = "Allow access from control plane to webhook port of AWS load balancer controller"
         }
   }
+
+  manage_aws_auth_configmap = true
 	
   # Map your required users
   aws_auth_users    = var.aws_auth_users
