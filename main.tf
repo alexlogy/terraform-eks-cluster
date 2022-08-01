@@ -55,6 +55,20 @@ module "eks" {
 
       # user data for LT
       pre_userdata = local.userdata
+	  
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 100
+            volume_type           = "gp3"
+            iops                  = 3000
+            throughput            = 150
+            encrypted             = false
+            delete_on_termination = true
+          }
+        }
+      }
 
       update_config = {
         max_unavailable_percentage = 10 # or set `max_unavailable`
