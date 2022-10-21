@@ -91,7 +91,19 @@ module "eks" {
     # Any other Node Group
   }
 
-  # Security Group
+  # Cluster Security Group
+  cluster_security_group_additional_rules = {
+    egress_nodes_ephemeral_ports_tcp = {
+      description                = "To node 1025-65535"
+      protocol                   = "tcp"
+      from_port                  = 1025
+      to_port                    = 65535
+      type                       = "egress"
+      source_node_security_group = true
+    }
+  }
+
+  # Node Security Group
   node_security_group_additional_rules  = {
         ingress_allow_access_from_control_plane = {
                 type                          = "ingress"
@@ -100,6 +112,39 @@ module "eks" {
                 to_port                       = 9443
                 source_cluster_security_group = true
                 description                   = "Allow access from control plane to webhook port of AWS load balancer controller"
+        }
+        ingress_nginx_allow_access_from_control_plane = {
+                type                          = "ingress"
+                protocol                      = "tcp"
+                from_port                     = 8443
+                to_port                       = 8443
+                source_cluster_security_group = true
+                description                   = "Allow access from control plane to webhook port of ingress nginx"
+        }
+	ingress_self_all = {
+      		description = "Node to node all ports/protocols"
+      		protocol    = "-1"
+      		from_port   = 0
+      		to_port     = 0
+      		type        = "ingress"
+      		self        = true
+    	}
+	ingress_cluster_metricserver = {
+	      description                   = "Cluster to node 4443 (Metrics Server)"
+	      protocol                      = "tcp"
+	      from_port                     = 4443
+	      to_port                       = 4443
+	      type                          = "ingress"
+	      source_cluster_security_group = true 
+	}
+        egress_cluster_jenkins = {
+              description                   = "Cluster to node 4443 (Metrics Server)"
+              type                          = "egress"
+              protocol                      = "-1"
+              from_port                     = 0
+              to_port                       = 0
+              type                          = "egress"
+              cidr_blocks                   = ["0.0.0.0/0"]
         }
   }
 
