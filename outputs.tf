@@ -125,3 +125,42 @@ output "aws_auth_configmap_yaml" {
   description = "Formatted yaml output for base aws-auth configmap containing roles used in cluster node groups/fargate profiles"
   value       = module.eks.aws_auth_configmap_yaml
 }
+  
+################################################################################
+# Kubeconfig
+################################################################################
+
+locals {
+  kubeconfig = <<KUBECONFIG
+
+
+apiVersion: v1
+clusters:
+- cluster:
+    server: ${module.eks.cluster_endpoint}
+    certificate-authority-data: ${module.eks.cluster_certificate_authority_data}
+  name: kubernetes
+contexts:
+- context:
+    cluster: kubernetes
+    user: aws
+  name: aws
+current-context: aws
+kind: Config
+preferences: {}
+users:
+- name: aws
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1alpha1
+      command: aws-iam-authenticator
+      args:
+        - "token"
+        - "-i"
+        - "${local.name}"
+KUBECONFIG
+}
+
+output "kubeconfig" {
+  value = "${local.kubeconfig}"
+}
