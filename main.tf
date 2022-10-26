@@ -93,6 +93,15 @@ module "eks" {
 
   # Cluster Security Group
   cluster_security_group_additional_rules = {
+    # allow public access to call api
+    ingress_cluster_api = {
+          description                   = "VPC to Cluster API"
+          protocol                      = "tcp"
+          from_port                     = 443
+          to_port                       = 443
+          type                          = "ingress"
+          cidr_blocks                   = ["0.0.0.0/0"]
+    }
     egress_nodes_ephemeral_ports_tcp = {
       description                = "To node 1025-65535"
       protocol                   = "tcp"
